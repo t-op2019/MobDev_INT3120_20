@@ -17,8 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,9 +26,7 @@ import com.example.playground.ui.theme.Blue40
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Donation() {
-	val (amount, setAmount) = remember { mutableStateOf("") }
-	val (donated, setDonated) = remember { mutableStateOf(0) }
+fun Donation(amount: String, setAmount: (String) -> Unit, donated: Int, setDonated: (Int) -> Unit) {
 	Column {
 		Row(
 			modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top
