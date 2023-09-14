@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.dp
 fun Login() {
 	val (username, setUsername) = remember { mutableStateOf("") }
 	val (password, setPassword) = remember { mutableStateOf("") }
+	val (open, setOpen) = remember { mutableStateOf(true) }
+	val (chosenOption, setChosenOption) = remember { mutableStateOf("") }
 	Column(modifier = Modifier.fillMaxWidth()) {
 		TextField(
 			value = username,
@@ -41,5 +43,7 @@ fun Login() {
 		Button(onClick = { /*TODO*/ }, shape = RoundedCornerShape(10.dp)) {
 			Text("Go!")
 		}
+		Text(text = "Selected option: $chosenOption")
+		OutlinedSpinner(setChosenOption = setChosenOption)
 	}
 }
