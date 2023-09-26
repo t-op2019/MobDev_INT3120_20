@@ -1,11 +1,15 @@
 package com.week_7_hw
 
 import android.app.SearchManager
+import android.content.ComponentName
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,10 +22,15 @@ import androidx.compose.ui.unit.dp
 import com.week_7_hw.ui.theme.Week_7_hwTheme
 
 class SubActivity : ComponentActivity() {
+	@RequiresApi(Build.VERSION_CODES.O)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+		val receiver: W7BroadcastReceiver = W7BroadcastReceiver()
+		val intentFilter: IntentFilter = IntentFilter("com.week_8_hw.CUSTOM_EVENT")
+		registerReceiver(receiver, intentFilter, RECEIVER_EXPORTED)
 		val intent: Intent = this.intent
 		val message: String? = intent.getStringExtra("EXTRA_MESSAGE")
+		val broadcastMessage: String? = intent.getStringExtra("MESSAGE_FROM_BROADCAST")
 		val spacerModifier: Modifier = Modifier.padding(10.dp)
 		setContent {
 			Week_7_hwTheme {
@@ -32,7 +41,12 @@ class SubActivity : ComponentActivity() {
 				) {
 					Column {
 						Text(text = "This is the sub activity")
-						Text(text = message ?: "No message received")
+						if (!message.isNullOrEmpty()) {
+							Text(text = "Message from main activity: $message")
+						}
+						if (!broadcastMessage.isNullOrEmpty()) {
+							Text(text = "Message from broadcast: $broadcastMessage")
+						}
 						Button(onClick = { dialPolice() }, modifier = spacerModifier) {
 							Text(text = "Click me to dial the police")
 						}
@@ -50,6 +64,12 @@ class SubActivity : ComponentActivity() {
 						}
 						Button(onClick = { showLocation() }, modifier = spacerModifier) {
 							Text(text = "Click me to show a random location")
+						}
+						Button(onClick = { goToHW6() }, modifier = spacerModifier) {
+							Text(text = "Click me to go to HW6")
+						}
+						Button(onClick = { goToHW8() }, modifier = spacerModifier) {
+							Text(text = "Click me to go to HW8")
 						}
 						Button(onClick = { onBackPressed() }, modifier = spacerModifier) {
 							Text(text = "Click me to go back to the main activity")
@@ -99,6 +119,18 @@ class SubActivity : ComponentActivity() {
 	private fun showLocation() {
 		val geoCode = "geo:420.69, 69.420"
 		val intent: Intent = Intent(Intent.ACTION_VIEW, Uri.parse(geoCode))
+		startActivity(intent)
+	}
+
+	private fun goToHW6() {
+		val intent: Intent = Intent(Intent.ACTION_MAIN)
+		intent.component = ComponentName("com.week_6_hw", "com.week_6_hw.MainActivity")
+		startActivity(intent)
+	}
+
+	private fun goToHW8() {
+		val intent: Intent = Intent(Intent.ACTION_MAIN)
+		intent.component = ComponentName("com.week_8_hw", "com.week_8_hw.MainActivity")
 		startActivity(intent)
 	}
 }
