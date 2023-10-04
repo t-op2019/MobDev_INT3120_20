@@ -129,18 +129,18 @@ class MainActivity : ComponentActivity() {
 	}
 
 	private fun createNewAlbumDir(albumName: String): File {
-		val albumDir = File(getMusicPublicDirectory(), albumName)
+		val publicDocDir =
+			Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+		println("public music dir path: ${publicDocDir.absolutePath}")
+		val albumDir = File(publicDocDir, albumName)
 		if (!albumDir.mkdirs()) {
 			Log.e("error", "Directory not created")
+		} else {
+			val file = File(albumDir, "$albumName.txt")
+			file.writeText("This is a txt file for $albumName")
+			println("$albumName file path: ${file.absolutePath}")
 		}
 		return albumDir
-	}
-
-	private fun getMusicPublicDirectory(): File {
-		val publicMusicDir =
-			Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
-		println("music dir path: ${publicMusicDir.absolutePath}")
-		return publicMusicDir
 	}
 
 	private fun createPrivateHomeWorkDir(): File {
@@ -149,6 +149,10 @@ class MainActivity : ComponentActivity() {
 		val homeWorkDir = File(privateDir, "homeWork")
 		if (!homeWorkDir.mkdirs()) {
 			Log.e("error", "Directory not created")
+		} else {
+			val file = File(homeWorkDir, "homeWork.txt")
+			file.writeText("This is a txt file for homeWork")
+			println("homeWork file path: ${file.absolutePath}")
 		}
 		return homeWorkDir
 	}

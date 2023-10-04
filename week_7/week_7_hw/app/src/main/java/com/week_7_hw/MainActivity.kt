@@ -30,6 +30,9 @@ class MainActivity : ComponentActivity() {
 						if (feedback.isNotEmpty()) {
 							Text(text = feedback)
 						}
+						Button(onClick = { broadcastInternally() }) {
+							Text(text = "Click me to broadcast internally")
+						}
 					}
 				}
 			}
@@ -51,6 +54,15 @@ class MainActivity : ComponentActivity() {
 		val intent: Intent = Intent(this, SubActivity::class.java)
 		intent.putExtra("EXTRA_MESSAGE", "This is the message from the main activity")
 		startActivityForResult(intent, 69)
+	}
+
+	private fun broadcastInternally() {
+		val intent: Intent = Intent("INTERNAL_BROADCAST")
+		intent.putExtra(
+			"INTERNAL_MSG",
+			"This is an internal broadcast"
+		)
+		sendBroadcast(intent)
 	}
 }
 

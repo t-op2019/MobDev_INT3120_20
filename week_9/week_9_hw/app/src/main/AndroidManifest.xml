@@ -7,7 +7,8 @@
         android:maxSdkVersion="32" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
+        android:maxSdkVersion="32"
+        tools:ignore="scopedStorage" />
 
     <application
         android:allowBackup="true"

@@ -22,11 +22,12 @@ import androidx.compose.ui.unit.dp
 import com.week_7_hw.ui.theme.Week_7_hwTheme
 
 class SubActivity : ComponentActivity() {
+	private val receiver: InternalBroadcastReceiver = InternalBroadcastReceiver()
+	private val intentFilter: IntentFilter = IntentFilter("INTERNAL_BROADCAST")
+
 	@RequiresApi(Build.VERSION_CODES.O)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		val receiver: W7BroadcastReceiver = W7BroadcastReceiver()
-		val intentFilter: IntentFilter = IntentFilter("com.week_8_hw.CUSTOM_EVENT")
 		registerReceiver(receiver, intentFilter, RECEIVER_EXPORTED)
 		val intent: Intent = this.intent
 		val message: String? = intent.getStringExtra("EXTRA_MESSAGE")
@@ -71,6 +72,9 @@ class SubActivity : ComponentActivity() {
 						Button(onClick = { goToHW8() }, modifier = spacerModifier) {
 							Text(text = "Click me to go to HW8")
 						}
+						Button(onClick = { broadcastInternally() }, modifier = spacerModifier) {
+							Text(text = "Click me to broadcast internally")
+						}
 						Button(onClick = { onBackPressed() }, modifier = spacerModifier) {
 							Text(text = "Click me to go back to the main activity")
 						}
@@ -78,6 +82,11 @@ class SubActivity : ComponentActivity() {
 				}
 			}
 		}
+	}
+
+	override fun onStop() {
+		super.onStop()
+		unregisterReceiver(receiver)
 	}
 
 	override fun finish() {
@@ -132,5 +141,14 @@ class SubActivity : ComponentActivity() {
 		val intent: Intent = Intent(Intent.ACTION_MAIN)
 		intent.component = ComponentName("com.week_8_hw", "com.week_8_hw.MainActivity")
 		startActivity(intent)
+	}
+
+	private fun broadcastInternally() {
+		val intent: Intent = Intent("INTERNAL_BROADCAST")
+		intent.putExtra(
+			"message",
+			"This is an internal broadcast"
+		)
+		sendBroadcast(intent)
 	}
 }
