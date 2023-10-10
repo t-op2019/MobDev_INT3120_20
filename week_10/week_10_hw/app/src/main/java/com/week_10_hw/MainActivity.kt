@@ -72,7 +72,13 @@ class MainActivity : ComponentActivity() {
 							onClick = { insertContactName(name); setName("") },
 							modifier = spacerModifier
 						) {
-							Text(text = "Insert EN Word")
+							Text(text = "Insert contact")
+						}
+						Button(
+							onClick = { bulkInsertContactName(name); setName("") },
+							modifier = spacerModifier
+						) {
+							Text(text = "Bulk insert contact")
 						}
 						Button(
 							onClick = {
@@ -82,7 +88,7 @@ class MainActivity : ComponentActivity() {
 							},
 							modifier = spacerModifier
 						) {
-							Text(text = "Update EN Word")
+							Text(text = "Update contact")
 						}
 						Button(
 							onClick = {
@@ -92,7 +98,7 @@ class MainActivity : ComponentActivity() {
 							},
 							modifier = spacerModifier
 						) {
-							Text(text = "Delete EN Word")
+							Text(text = "Delete contact")
 						}
 					}
 				}
@@ -103,9 +109,12 @@ class MainActivity : ComponentActivity() {
 	private fun readContacts(): String {
 		var res = ""
 		val projection =
-			arrayOf(ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME)
+			arrayOf(
+				ContactsContract.RawContacts.CONTACT_ID,
+				ContactsContract.RawContacts.SOURCE_ID
+			)
 		val cursor = contentResolver.query(
-			ContactsContract.Contacts.CONTENT_URI,
+			ContactsContract.RawContacts.CONTENT_URI,
 			projection,
 			null,
 			null,
@@ -113,9 +122,10 @@ class MainActivity : ComponentActivity() {
 		)
 		cursor?.use {
 			while (it.moveToNext()) {
-				val contactId = it.getLong(it.getColumnIndex(ContactsContract.Contacts._ID) ?: 0)
+				val contactId =
+					it.getLong(it.getColumnIndex(ContactsContract.RawContacts.CONTACT_ID) ?: 0)
 				val name =
-					it.getString(it.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME) ?: 0)
+					it.getString(it.getColumnIndex(ContactsContract.RawContacts.SOURCE_ID) ?: 0)
 				res += "$contactId: $name\n"
 			}
 		}
@@ -126,29 +136,46 @@ class MainActivity : ComponentActivity() {
 
 	private fun insertContactName(name: String) {
 		val values = ContentValues().apply {
-			put(ContactsContract.Contacts.DISPLAY_NAME, name)
+			put(ContactsContract.RawContacts.SOURCE_ID, name)
+//			put(ContactsContract.RawContacts.ACCOUNT_TYPE, "com.example.account")
 		}
 		contentResolver.insert(ContactsContract.RawContacts.CONTENT_URI, values)
 	}
 
+	private fun bulkInsertContactName(name: String) {
+		val valueList = arrayOf<ContentValues>().apply {
+			for (i in 1..10) {
+				val values = ContentValues().apply {
+					put(ContactsContract.RawContacts.SOURCE_ID, "$name $i")
+//					put(ContactsContract.RawContacts.ACCOUNT_TYPE, "com.example.account")
+				}
+				plus(values)
+			}
+		}
+
+		println("valueList: $valueList")
+		contentResolver.bulkInsert(ContactsContract.RawContacts.CONTENT_URI, valueList)
+	}
+
 	private fun updateById(word: String, id: Int) {
 		val values = ContentValues().apply {
-			put(ContactsContract.Contacts.DISPLAY_NAME, word)
+			put(ContactsContract.RawContacts.SOURCE_ID, word)
 		}
-		val selection = "${ContactsContract.Contacts._ID} = ?"
+		val selection = "${ContactsContract.RawContacts.CONTACT_ID} = ?"
 		val selectionArgs = arrayOf(id.toString())
-		contentResolver.update(
-			ContactsContract.Contacts.CONTENT_URI,
+		val res = contentResolver.update(
+			ContactsContract.RawContacts.CONTENT_URI,
 			values,
 			selection,
 			selectionArgs
 		)
+		println("update res: $res")
 	}
 
 	private fun deleteById(id: Int) {
-		val selection = "${ContactsContract.Contacts._ID} = ?"
+		val selection = "${ContactsContract.RawContacts.CONTACT_ID} = ?"
 		val selectionArgs = arrayOf(id.toString())
-		contentResolver.delete(ContactsContract.Contacts.CONTENT_URI, selection, selectionArgs)
+		contentResolver.delete(ContactsContract.RawContacts.CONTENT_URI, selection, selectionArgs)
 	}
 }
 
